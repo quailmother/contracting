@@ -3,6 +3,14 @@ from multiprocessing import Lock
 from seneca.parallelism.conflict_resolution import CRContext
 
 
+# TODO rename this to just 'BookKeeper' if we decide we can cut out the global BookKeeper below
+class BookKeeperInstance:
+    def __init__(self, sbb_idx: int, contract_idx: int):
+        assert sbb_idx >= 0, "sbb idx must be greater that or equal to 0"
+        assert contract_idx >= 0, "contract idx must be greater that or equal to 0"
+        self.sbb_idx, self.contract_idx = sbb_idx, contract_idx
+
+
 class BookKeeper:
     _shared_state = {}
     _lock = Lock()
