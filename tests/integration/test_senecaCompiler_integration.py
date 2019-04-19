@@ -137,3 +137,15 @@ def e():
         code_str = astor.to_source(comp)
 
         self.assertEqual(len([m.start() for m in re.finditer(config.PRIVATE_METHOD_PREFIX, code_str)]), 9)
+
+    def test_constructor_renamed(self):
+        code = '''
+@seneca_construct
+def im_the_grinch():
+    return 12
+'''
+        c = SenecaCompiler()
+        comp = c.parse(code, lint=False)
+        code_str = astor.to_source(comp)
+
+        print(code_str)

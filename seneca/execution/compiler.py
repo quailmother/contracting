@@ -61,8 +61,8 @@ class SenecaCompiler(ast.NodeTransformer):
             decorator = node.decorator_list.pop()
 
             # change the name of the init function to '____' so it is uncallable except once
-            if decorator == config.INIT_DECORATOR_STRING:
-                node.name = '____'
+            if decorator.id == config.INIT_DECORATOR_STRING:
+                node.name = config.INIT_FUNC_NAME
         else:
             self.private_expr.add(node.name)
             node.name = self.privatize(node.name)
