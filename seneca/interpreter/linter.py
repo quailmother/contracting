@@ -7,33 +7,34 @@ from ..logger import get_logger
 
 
 class Linter(ast.NodeVisitor):
+    violations = []
 
     def __init__(self):
         self.log = get_logger('Seneca.Parser')
-        self._violations = []
         self._functions = []
         self._is_one_export = False
         self._is_success = True
         self._constructor_visited = False
+        #self.driver = ContractDriver()
 
-#    @staticmethod
-    def ast_types(self, t):
+    @staticmethod
+    def ast_types(t):
         if type(t) not in ALLOWED_AST_TYPES:
             str = "Error : Illegal AST type: {}" .format(type(t).__name__)
-            self._violations.append(str)
+            Linter.violations.append(str)
 
-#    @staticmethod
-    def not_system_variable(self, v):
+    @staticmethod
+    def not_system_variable(v):
         if v.startswith('_'):
             str = "Error : Incorrect use of <_> access denied for var : {}".format(v)
-            self._violations.append(str)
+            Linter.violations.append(str)
 
-#    @staticmethod
-    def no_nested_imports(self, node):
+    @staticmethod
+    def no_nested_imports(node):
         for item in node.body:
             if type(item) in [ast.ImportFrom, ast.Import]:
                 str = "Error : Nested import is illegal"
-                self._violations.append(str)
+                Linter.violations.append(str)
 
     def visit_Name(self, node):
         self.not_system_variable(node.id)
@@ -52,12 +53,12 @@ class Linter(ast.NodeVisitor):
 
     def visit_ImportFrom(self, node):
         str = 'ImportFrom ast nodes not yet supported.'
-        self._violations.append(str)
+        Linter.violations.append(str)
 
     def validate_imports(self, import_path, module_name=None, alias=None):
         if self.driver.get_contract(import_path) is None:
             str = 'Contract named "{}" does not exist in state.'.format(import_path)
-            self._violations.append(str)
+            Linter.violations.append(str)
 
     def _visit_any_import(self, node):
         self.generic_visit(node)
@@ -86,10 +87,10 @@ class Linter(ast.NodeVisitor):
             if node.value.func.id in ['Variable', 'Hash']:
                 if len(node.value.keywords) > 0:
                     str = 'Keyword overloading not allowed for ORM assignments.'
-                    self._violations.append(str)
+                    Linter.violations.append(str)
             if len(node.targets) > 1:
                 str = 'Multiple targets to an ORM definition is not allowed.'
-                self._violations.append(str)
+                Linter.violations.append(str)
 
         self.generic_visit(node)
         return node
@@ -118,28 +119,27 @@ class Linter(ast.NodeVisitor):
         if len(node.decorator_list) > 1:
             str = 'Function definition can only contain 1 decorator. Currently contains {}.'\
                 .format(len(node.decorator_list))
-            self._violations.append(str)
+            Linter.violations.append(str)
 
         for d in node.decorator_list:
             # Only allow decorators from the allowed set.
             if d.id not in config.VALID_DECORATORS:
                 str = '{} is an invalid decorator. Must be one of {}'.format(d.id,
                                                                              config.VALID_DECORATORS)
-                self._violations.append(str)
+                Linter.violations.append(str)
             if d.id == config.EXPORT_DECORATOR_STRING:
                 self._is_one_export = True
 
             if d.id == config.INIT_DECORATOR_STRING:
                 if self._constructor_visited:
                     str = 'Multiple constructors not allowed.'
-                    self._violations.append(str)
+                    Linter.violations.append(str)
                 self._constructor_visited = True
 
         self.generic_visit(node)
         return node
 
     def _reset(self):
-        self._violations = []
         self._functions = []
         self._is_one_export = False
         self._is_success = True
@@ -147,8 +147,7 @@ class Linter(ast.NodeVisitor):
 
     def _final_checks(self):
         if not self._is_one_export:
-            self.log.error("Need atleast one method with @seneca_export() decorator that outside world use to interact "
-                           "with this contract")
+            self.log.error("Need atleast one method with @seneca_export() decorator that outside world use to interact with this contract")
             self._is_success = False
     
     def _collect_function_defs(self, root):
@@ -170,11 +169,11 @@ class Linter(ast.NodeVisitor):
         self._final_checks()
         return self._is_success
 
-#    @staticmethod
-    def dump_violations(self):
+    @staticmethod
+    def dump_violations():
         import pprint
         pp = pprint.PrettyPrinter(indent = 4)
-        pp.pprint(self._violations)
+        pp.pprint(Linter.violations)
 
 
 

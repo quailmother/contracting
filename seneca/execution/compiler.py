@@ -11,7 +11,6 @@ class SenecaCompiler(ast.NodeTransformer):
         self.log = get_logger('Seneca.Compiler')
         self.module_name = module_name
         self.linter = linter
-        self.lint_alerts = None
         self.constructor_visited = False
         self.private_expr = set()
         self.visited_expr = set() # store the method visits
@@ -22,13 +21,11 @@ class SenecaCompiler(ast.NodeTransformer):
         tree = ast.parse(source)
 
         if lint:
-            self.lint_alerts = self.linter.check(tree)
-            # ast.fix_missing_locations(tree)
-        else:
-            tree = self.visit(tree)
+            self.linter.check(tree)
+            if len(self.linter.violations) > 0:
+                raise Exception(self.linter.violations[-1])
 
-        if self.lint_alerts is not None:
-            raise Exception(self.lint_alerts)
+        tree = self.visit(tree)
 
         # check all visited nodes and see if they are actually private
         for node in self.visited_expr:
@@ -43,6 +40,7 @@ class SenecaCompiler(ast.NodeTransformer):
         self.visited_expr = set()
 
         return tree
+
 
     @staticmethod
     def privatize(s):

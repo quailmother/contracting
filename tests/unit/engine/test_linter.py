@@ -4,6 +4,7 @@ from seneca.exceptions import CompilationException
 import ast
 from seneca.interpreter.whitelists import ALLOWED_AST_TYPES
 
+
 class TestLinter(TestCase):
     def setUp(self):
         self.l = Linter()
@@ -30,24 +31,24 @@ def a():
         for t in ALLOWED_AST_TYPES:
             _t = t()
             self.l.ast_types(_t)
-            self.assertListEqual([], self.l._violations)
+            self.assertListEqual([], self.l.violations)
 
     def test_bad_ast_type(self):
         err = 'Error : Illegal AST type: AsyncFunctionDef'
         t = ast.AsyncFunctionDef()
         self.l.ast_types(t)
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     def test_not_system_variable(self):
         v = 'package'
         self.l.not_system_variable(v)
-        self.assertListEqual([], self.l._violations)
+        self.assertListEqual([], self.l.violations)
 
     def test_system_variable(self):
         v = '__package__'
         err = "Error : Incorrect use of <_> access denied for var : __package__"
         self.l.not_system_variable(v)
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     '''
     Is blocking all underscore variables really the solution to preventing access to system variables?
@@ -63,7 +64,7 @@ def a():
         c = ast.parse(code)
         self.l.visit(c)
         self.l.dump_violations()
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     def test_not_system_variable_ast_success(self):
         code = '''
@@ -73,7 +74,7 @@ def a():
         '''
         c = ast.parse(code)
         self.l.visit(c)
-        self.assertListEqual([], self.l._violations)
+        self.assertListEqual([], self.l.violations)
 
     def test_visit_async_func_def_fail(self):
         err = 'Error : Illegal AST type: AsyncFunctionDef'
@@ -81,7 +82,7 @@ def a():
 
         self.l.visit_AsyncFunctionDef(n)
         self.l.dump_violations()
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     def test_visit_async_func_def_fail_code(self):
         code = '''
@@ -93,7 +94,7 @@ async def a():
 
         c = ast.parse(code)
         self.l.visit(c)
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
 
     def test_visit_class_fail(self):
@@ -102,7 +103,7 @@ async def a():
         self.l.visit_ClassDef(n)
         self.l.dump_violations()
 
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
 
     def test_visit_class_fail_code(self):
@@ -115,7 +116,7 @@ class Scooby:
         c = ast.parse(code)
         self.l.visit(c)
         self.l.dump_violations()
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
 
     def test_accessing_system_vars(self):
@@ -128,7 +129,7 @@ def a():
         err = 'Error : Incorrect use of <_> access denied for var : __dir__'
         c = ast.parse(code)
         self.l.visit(c)
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     def test_accessing_attribute(self):
         code = '''
@@ -140,7 +141,7 @@ def a():
 
         c = ast.parse(code)
         self.l.visit(c)
-        self.assertListEqual([], self.l._violations)
+        self.assertListEqual([], self.l.violations)
 
 #TODO failed test case
 
@@ -167,7 +168,7 @@ def a():
         c = ast.parse(code)
         self.l.no_nested_imports(c)
         self.l.dump_violations()
-        self.assertListEqual([], self.l._violations)
+        self.assertListEqual([], self.l.violations)
 
 
 
@@ -180,7 +181,7 @@ def a():
 '''
         c = ast.parse(code)
         self.l.visit(c)
-        self.assertListEqual([], self.l._violations)
+        self.assertListEqual([], self.l.violations)
 
     def test_import_works(self):
         self.l.driver.set_contract('something', 'a = 10')
@@ -195,7 +196,7 @@ def a():
         c = ast.parse(code)
         self.l.visit(c)
         self.l.driver.flush()
-        self.assertListEqual([], self.l._violations)
+        self.assertListEqual([], self.l.violations)
 
 
     def test_no_import_from(self):
@@ -211,7 +212,7 @@ def a():
         c = ast.parse(code)
         self.l.visit(c)
         self.l.dump_violations()
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     def test_import_non_existent_contract(self):
         code = '''
@@ -225,7 +226,7 @@ def a():
 
         c = ast.parse(code)
         self.l.visit(c)
-        self.assertMultiLineEqual(err, self.l._violations[0])
+        self.assertMultiLineEqual(err, self.l.violations[0])
 
     def test_final_checks_set_properly(self):
         code = '''
