@@ -2,6 +2,7 @@ from seneca.db.driver import ContractDriver
 from seneca.execution.runtime import rt
 from seneca import config
 from seneca.execution.linter import Linter
+import importlib
 
 class Datum:
     def __init__(self, contract, name, driver: ContractDriver):
@@ -78,3 +79,8 @@ class Contract:
 
     def submit(self, name, code, author):
         self.driver.set_contract(name=name, code=code, author=author, overwrite=False)
+
+        # try to import the contract to run the seed function
+        m = importlib.import_module(name)
+        if vars(m).get('____') is not None:
+            m.____()
