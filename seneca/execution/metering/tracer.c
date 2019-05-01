@@ -90,16 +90,16 @@ Tracer_dealloc(Tracer *self)
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-static void reprint(PyObject *obj) {
-    PyObject * repr = PyObject_Repr(obj);
-    PyObject * str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
-    const char *bytes = PyBytes_AS_STRING(str);
-
-    printf("REPR: %s\n", bytes);
-
-    Py_XDECREF(repr);
-    Py_XDECREF(str);
-}
+//static void reprint(PyObject *obj) {
+//    PyObject * repr = PyObject_Repr(obj);
+//    PyObject * str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+//    const char *bytes = PyBytes_AS_STRING(str);
+//
+//    printf("REPR: %s\n", bytes);
+//
+//    Py_XDECREF(repr);
+//    Py_XDECREF(str);
+//}
 
 
 /*
@@ -206,7 +206,7 @@ Tracer_methods[] = {
 static PyTypeObject
 TracerType = {
     MyType_HEAD_INIT
-    "seneca.libs.metering.tracer",         /*tp_name*/
+    "seneca.execution.metering.tracer",         /*tp_name*/
     sizeof(Tracer),            /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)Tracer_dealloc, /*tp_dealloc*/
@@ -254,7 +254,7 @@ TracerType = {
 static PyModuleDef
 moduledef = {
     PyModuleDef_HEAD_INIT,
-    "seneca.libs.metering.tracer",
+    "seneca.execution.metering.tracer",
     MODULE_DOC,
     -1,
     NULL,       /* methods */
@@ -290,7 +290,7 @@ void
 inittracer(void)
 {
     PyObject * mod;
-    mod = Py_InitModule3("seneca.libs.metering.tracer", NULL, MODULE_DOC);
+    mod = Py_InitModule3("seneca.execution.metering.tracer", NULL, MODULE_DOC);
 
     if (mod == NULL) {
         return;
