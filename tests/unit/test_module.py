@@ -53,24 +53,19 @@ class TestDatabaseLoader(TestCase):
         self.assertEqual(self.dl.create_module(None), None, 'self.create_module should return None')
 
     def test_exec_module(self):
-        module = types.ModuleType('test')
+        module = types.ModuleType('howdy')
 
-        self.dl.d.set_contract('test', 'b = 1337')
+        self.dl.d.set_contract('howdy', 'b = 1337')
         self.dl.exec_module(module)
         self.dl.d.flush()
 
         self.assertEqual(module.b, 1337)
 
-    def test_exec_non_existance_module(self):
-        module = types.ModuleType('test')
-
-        with self.assertRaises(ImportError):
-            self.dl.exec_module(module)
-
     def test_exec_module_nonattribute(self):
-        module = types.ModuleType('test')
+        module = types.ModuleType('howdy')
 
-        self.dl.d.set_contract('test', 'b = 1337')
+        self.dl.d.set_contract('howdy', 'b = 1337')
+        self.dl.d.commit()
         self.dl.exec_module(module)
         self.dl.d.flush()
 
@@ -105,12 +100,11 @@ class TestInstallLoader(TestCase):
     def test_integration_and_importing(self):
         dl = DatabaseLoader()
         dl.d.set_contract('testing', 'a = 1234567890')
+        dl.d.commit()
 
         install_database_loader()
 
         import testing
-
-        #dl.d.flush()
 
         self.assertEqual(testing.a, 1234567890)
 

@@ -1,77 +1,61 @@
-import ast, builtins
-from decimal import Decimal
-
-NUMBER_TYPES = (int, float)
-APPROVED_TYPES = (Decimal, str, bool, bytes)
+import ast
 
 ALLOWED_AST_TYPES = {
-    ast.Module,
-    ast.Eq,
-    ast.Call,
-    ast.Dict,
-    ast.Attribute,
-    ast.Pow,
-    ast.Index,
-    ast.Not,
-    ast.alias,
-    ast.If,
-    ast.FunctionDef,
-    ast.Global,  # Used for setting up resources in seed function during compilation
-    ast.GtE,
-    ast.LtE,
-    ast.Load,
-    ast.arg,
     ast.Add,
-    #ast.Lambda,    # raghu todo consider removing it
-    ast.Import,
-    ast.ImportFrom,
-    ast.Name,
-    ast.Num,
-    ast.BinOp,
-    ast.Store,
+    ast.And,
+    ast.arg,
+    ast.arguments,
     ast.Assert,
     ast.Assign,
+    ast.Attribute,
     ast.AugAssign,
-    ast.Subscript,
-    ast.Compare,
-    ast.Return,
-    ast.NameConstant,
-    ast.Expr,
-    ast.keyword,
-    ast.Sub,
-    ast.arguments,
-    ast.List,
-    ast.Set,
-    ast.Str,
-    ast.UnaryOp,
-    ast.Pass,
-    ast.Tuple,
-    ast.Div,
-    ast.In,
-    ast.NotIn,
-    ast.Gt,
-    ast.Lt,
-    ast.Starred,
-    ast.Mod,
-    ast.NotEq,
-    # Loops
-    ast.For,
-    ast.While,
-    # comprehension
-    ast.ListComp,
-    ast.comprehension,
-    ast.Slice,
-    ast.USub,
-    # Conditonals
+    ast.BinOp,
     ast.BoolOp,
-    ast.And,
-    ast.Or,
+    ast.Call,
+    ast.Compare,
+    ast.comprehension,
+    ast.Dict,
+    ast.Div,
+    ast.Eq,
+    ast.Expr,
+    ast.For,
+    ast.FunctionDef,
+    ast.Gt,
+    ast.GtE,
+    ast.If,
+    ast.Import,
+    ast.In,
+    ast.Index,
+    ast.keyword,
+    ast.List,
+    ast.ListComp,
+    ast.Load,
+    ast.Lt,
+    ast.LtE,
+    ast.Mod,
+    ast.Module,
     ast.Mult,
-
-    # TODO: Decide if we actually want these
-    # Error handling
-    # ast.ExceptHandler,
-    # ast.Try,
+    ast.Name,
+    ast.NameConstant,
+    ast.Not,
+    ast.NotEq,
+    ast.NotIn,
+    ast.Num,
+    ast.Or,
+    ast.Pass,
+    ast.Pow,
+    ast.Return,
+    ast.Set,
+    ast.Slice,
+    ast.Starred,
+    ast.Store,
+    ast.Str,
+    ast.Sub,
+    ast.Subscript,
+    ast.Tuple,
+    ast.UnaryOp,
+    ast.USub,
+    ast.While,
 }
 
 VIOLATION_TRIGGERS = [
@@ -89,115 +73,3 @@ VIOLATION_TRIGGERS = [
     "S12- Multiple targets to ORM definition detected",
     "S13- No valid contracting decorator found"
 ]
-
-
-ALLOWED_IMPORT_PATHS = [
-    'contracting.contracts',
-    'test_contracts'
-]
-
-_SAFE_NAMES = [
-    '__import__',
-
-    'None',
-    'False',
-    'True',
-
-    'callable',
-    'isinstance',
-    'issubclass',
-
-    'abs',
-    'bool',
-    'chr',
-    'complex',
-    'divmod',
-    # 'float',
-    'hash',
-    'hex',
-    'id',
-    # 'int',
-
-    'len',
-    'oct',
-    'ord',
-    'pow',
-    'range',
-    'repr',
-    'round',
-    'slice',
-    'str',
-    'bytes',
-    'tuple',
-    'zip',
-
-    # Iteration
-    'map',
-    'list',
-
-    # JUST FOR TESTING! TODO remove this irl
-    # 'dir',
-    # 'help',
-    'print',
-    # 'globals',
-    # 'locals',
-    # 'type'
-]
-
-_SAFE_EXCEPTIONS = [
-    'ArithmeticError',
-    'AssertionError',
-    'AttributeError',
-    'BaseException',
-    'BufferError',
-    'BytesWarning',
-    'DeprecationWarning',
-    'EOFError',
-    'EnvironmentError',
-    'Exception',
-    'FloatingPointError',
-    'FutureWarning',
-    'GeneratorExit',
-    'IOError',
-    'ImportError',
-    'ImportWarning',
-    'IndentationError',
-    'IndexError',
-    'KeyError',
-    'KeyboardInterrupt',
-    'LookupError',
-    'MemoryError',
-    'NameError',
-    'NotImplementedError',
-    'OSError',
-    'OverflowError',
-    'PendingDeprecationWarning',
-    'ReferenceError',
-    'RuntimeError',
-    'RuntimeWarning',
-    'StopIteration',
-    'SyntaxError',
-    'SyntaxWarning',
-    'SystemError',
-    'SystemExit',
-    'TabError',
-    'TypeError',
-    'UnboundLocalError',
-    'UnicodeDecodeError',
-    'UnicodeEncodeError',
-    'UnicodeError',
-    'UnicodeTranslateError',
-    'UnicodeWarning',
-    'UserWarning',
-    'ValueError',
-    'Warning',
-    'ZeroDivisionError',
-]
-
-SAFE_BUILTINS = {}
-
-for name in _SAFE_NAMES:
-    SAFE_BUILTINS[name] = getattr(builtins, name)
-
-for name in _SAFE_EXCEPTIONS:
-    SAFE_BUILTINS[name] = getattr(builtins, name)
